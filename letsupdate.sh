@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ## Information
-# Uberspace 6 - Let’s Encrypt Update Script for known Domains
+# Uberspace 6 - Let’s Encrypt Update Script for added Domains
 # @author Tobias Fichtner <fichtner@circinus.uberspace.de>
 
 ## Settings
@@ -14,7 +14,7 @@ HOMEDIR=${TMP_LIST_PASSWD[4]}
 # Let’s Encrypt Settings
 LETSSHARE="$HOMEDIR/.local/share/letsencrypt"
 LETSWORK="$LETSSHARE/work/"
-LETSCONFIG="$HOMEDIR/.config/letsencrypt/"
+LETSCONFIG="$HOMEDIR/.config/letsencrypt"
 LETSLOG="$LETSSHARE/logs/"
 LETSLIVE="$LETSCONFIG/live/"
 LETSCHALLANGE="/var/www/virtual/$USERNAME/html/"
@@ -24,7 +24,7 @@ LETSVALIDDAYS=5
 ## certificate function
 # order or renew a cert and add it
 function certificate ( ) {
-        letsencrypt certonly \
+        /usr/local/bin/letsencrypt certonly \
                 -d $1 \
                 --agree-tos \
                 --non-interactive \
@@ -37,7 +37,7 @@ function certificate ( ) {
                 -w="$LETSCHALLANGE" \
                 --key-path "$LETSLIVE/$1/privkey.pem" \
                 --cert-path "$LETSLIVE/$1/cert.pem"
-        uberspace-add-certificate -k "$LETSLIVE/$1/privkey.pem" -c "$LETSLIVE/$1/cert.pem"
+        /usr/local/bin/uberspace-add-certificate -k "$LETSLIVE/$1/privkey.pem" -c "$LETSLIVE/$1/cert.pem"
 }
 
 #
@@ -45,8 +45,8 @@ function certificate ( ) {
 #
 
 
-for domain in `uberspace-list-domains -w | grep -v "*.$USERNAME.$HOSTNAME"`; do
-        cert="$LETSLIVE$domaincert.pem"
+for domain in `/usr/local/bin/uberspace-list-domains -w | grep -v "*.$USERNAME.$HOSTNAME"`; do
+        cert="$LETSLIVE$domain/cert.pem"
         if [ -f $cert ]; then
                 openssl x509 -checkend $(( $LETSVALIDDAYS * 86400 )) -in $cert > /dev/null
                 if [ $? != 0 ]; then
