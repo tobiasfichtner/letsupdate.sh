@@ -36,7 +36,7 @@ function certificate ( ) {
                 --webroot \
                 -w="$LETSCHALLANGE" \
                 --key-path "$LETSLIVE/$1/privkey.pem" \
-                --cert-path "$LETSLIVE/$1/cert.pem \
+                --cert-path "$LETSLIVE/$1/cert.pem" \
                 --post-hook "/usr/local/bin/uberspace-add-certificate -k \"$LETSLIVE/$1/privkey.pem\" -c \"$LETSLIVE/$1/cert.pem\""
 }
 
