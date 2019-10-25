@@ -2,6 +2,7 @@
 
 ## Information
 # Uberspace 6 - Let’s Encrypt Update Script for added Domains
+#
 # @author Tobias Fichtner <fichtner@circinus.uberspace.de>
 
 ## Settings
@@ -18,13 +19,12 @@ LETSSHARE="$HOMEDIR/.local/share/letsencrypt"
 LETSWORK="$LETSSHARE/work/"
 LETSCONFIG="$HOMEDIR/.config/letsencrypt"
 LETSLOG="$LETSSHARE/logs/"
-LETSLIVE="$LETSCONFIG/live"
+LETSLIVE="$LETSCONFIG/live/"
 LETSCHALLANGE="/var/www/virtual/$USERNAME/html/"
 LETSRSA=4096
 LETSVALIDDAYS=5
 
 ## certificate function
-#
 # order or renew a cert and add it
 function certificate ( ) {
         /usr/local/bin/letsencrypt certonly \
@@ -56,10 +56,10 @@ function getIPv6 ( ) {
 #
 
 for domain in `/usr/local/bin/uberspace-list-domains -w | grep -v "*.$USERNAME.$HOSTNAME"`; do
-        cert="$LETSLIVE/$domain/cert.pem"
+        cert="$LETSLIVE$domain/cert.pem"
         if [ $USERIPv4 == "$(getIPv4 $domain)" ] || [ $USERIPv6 == "$(getIPv6 $domain)" ];then
             if [ -f $cert ]; then
-                    openssl x509 -checkend $(( $LETSVALIDDAYS * 86400 )) -in $cert > /dev/null
+                openssl s_client -connect $domain:443 -servername $domain 2>&1 | openssl x509 -checkend $(( $LETSVALIDDAYS * 86400 )) > /dev/null
                     if [ $? != 0 ]; then
                             echo
                             certificate $domain
